@@ -1,0 +1,213 @@
+datasource db {
+  provider = "mysql"  // Menunjukkan bahwa kamu menggunakan MySQL
+  url      = env("DATABASE_URL")  // URL koneksi diambil dari file .env
+}
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["windows", "debian-openssl-3.0.x"]
+}
+
+
+
+
+
+model User {
+  id             Int            @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email          String         @unique
+  password       String
+  classUser      ClassUser[]             // relasi ke banyak class sebagai guru/siswa
+  forums         Forum[]                 // forum yang dibuat user
+  logbooks       Logbook[]               // catatan logbook user (jika siswa)
+  groupMembers   GroupMember[]           // keanggotaan dalam grup
+  answer         StudentAnswer[]         // Bisa menampung banyak jawaban
+  profile        UserProfile?            // profil pengguna (bio, foto, dll)
+  primaryAnswer  PrimaryAnswer?
+}
+
+model UserProfile {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  bio         String?
+  profilePic  String?
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Class {
+  id          Int          @id @default(autoincrement())
+  name        String
+  deskripsi   String?
+  token       String       @unique // Token unik untuk kelas
+  youtubeID   String?     // ID YouTube untuk kelas
+  createdAt   DateTime     @default(now())
+  classUsers  ClassUser[]
+  primaryQuestion PrimaryQuestion[]
+  forums      Forum[]
+  tasks       Task[]
+  materials   Material[]
+  groups      Group[]
+}
+
+model ClassUser {
+  id        Int       @id @default(autoincrement())
+  classId   Int
+  userId    Int
+  role      ClassRole
+  user      User     @relation(fields: [userId], references: [id])
+  class     Class    @relation(fields: [classId], references: [id])
+
+  @@unique([classId, userId])
+}
+
+enum ClassRole {
+  TEACHER
+  STUDENT
+}
+
+model PrimaryQuestion {
+  id        Int       @id @default(autoincrement())
+  question  String
+  creatAt   DateTime  @default(now())
+  classId   Int
+
+  class      Class    @relation(fields: [classId], references: [id])
+
+  primaryAnswer PrimaryAnswer[]
+}
+
+model Material {
+  id         Int      @id @default(autoincrement())
+  title      String
+  filePath   String
+  size       Int      @default(0)      // ukuran file dalam bytes
+  createdAt  DateTime @default(now())
+  classId    Int
+  class      Class    @relation(fields: [classId], references: [id])
+}
+
+model Group {
+  id           Int           @id @default(autoincrement())
+  name         String
+  classId      Int
+  projectId    Int?          // opsional
+  reportId     Int?          // opsional
+
+  class        Class         @relation(fields: [classId], references: [id])
+  groupMembers GroupMember[]
+  logbooks     Logbook[]
+
+  // Penting: relasi satu-ke-satu ke Project dan Report
+  project      Project?
+  report       Report?
+}
+
+model GroupMember {
+  id       Int      @id @default(autoincrement())
+  groupId  Int
+  userId   Int
+  joinedAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  group    Group    @relation(fields: [groupId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model Project {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  createdAt     DateTime @default(now())
+
+  groupId   Int      @unique
+  group     Group    @relation(fields: [groupId], references: [id])
+}
+
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  title       String
+  filePath    String
+  createdAt   DateTime @default(now())
+  size        Int      @default(0)      // ukuran file dalam bytes
+
+  groupId     Int      @unique
+  group       Group    @relation(fields: [groupId], references: [id])
+}
+
+
+model Logbook {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  groupId   Int
+  userId    Int
+
+  group     Group    @relation(fields: [groupId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Forum {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  userId    Int
+  classId   Int
+
+  user      User     @relation(fields: [userId], references: [id])
+  class     Class    @relation(fields: [classId], references: [id])
+}
+
+model Task {
+  id          Int             @id @default(autoincrement())
+  title       String          // Title of the multiple-choice question
+  createdAt   DateTime        @default(now())
+  classId     Int
+  class       Class           @relation(fields: [classId], references: [id])
+  answerChoices AnswerChoice[] // A task can have multiple answer choices
+  studentAnswer StudentAnswer[] //
+}
+
+model AnswerChoice {
+  id        Int    @id @default(autoincrement())
+  taskId    Int
+  content   String // The content of the answer choice
+  isCorrect Boolean // Flag to mark if this is the correct answer
+  task      Task   @relation(fields: [taskId], references: [id])
+  answer    StudentAnswer[]
+}
+
+model StudentAnswer {
+  id        Int      @id @default(autoincrement())
+  taskId    Int      // The task (question) answered by the student
+  userId    Int      // The student answering the task
+  answerId  Int      // The chosen answer choice
+  createdAt DateTime @default(now())
+  
+  taskType    TaskType        // Task type (PRETEST, POSTTEST)
+  
+  
+  task      Task   @relation(fields: [taskId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])  // The student answering the task
+  answer    AnswerChoice @relation(fields: [answerId], references: [id]) // The answer choice chosen by the student
+
+  @@unique([userId, taskId, taskType])  // Menambahkan kombinasi userId dan taskId sebagai unik
+}
+
+enum TaskType {
+  PRETEST
+  POSTTEST
+}
+
+model PrimaryAnswer {
+  id                  Int       @id @default(autoincrement())
+  primaryQuestionId      Int
+  userId              Int       @unique
+  answer              String
+  createAt            DateTime  @default(now())
+
+  primaryQuestion     PrimaryQuestion   @relation(fields: [primaryQuestionId], references: [id])
+  user                User              @relation(fields: [userId], references: [id])
+}
