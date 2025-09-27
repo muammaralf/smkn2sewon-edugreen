@@ -59,10 +59,10 @@ CREATE TABLE `PrimaryQuestion` (
 CREATE TABLE `Material` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `filePath` VARCHAR(191) NOT NULL,
+    `size` INTEGER NOT NULL DEFAULT 0,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `classId` INTEGER NOT NULL,
-    `uploadedBy` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -93,7 +93,7 @@ CREATE TABLE `GroupMember` (
 CREATE TABLE `Project` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `groupId` INTEGER NOT NULL,
 
@@ -105,8 +105,9 @@ CREATE TABLE `Project` (
 CREATE TABLE `Report` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `filePath` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `size` INTEGER NOT NULL DEFAULT 0,
     `groupId` INTEGER NOT NULL,
 
     UNIQUE INDEX `Report_groupId_key`(`groupId`),
@@ -195,9 +196,6 @@ ALTER TABLE `PrimaryQuestion` ADD CONSTRAINT `PrimaryQuestion_classId_fkey` FORE
 
 -- AddForeignKey
 ALTER TABLE `Material` ADD CONSTRAINT `Material_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Class`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Material` ADD CONSTRAINT `Material_uploadedBy_fkey` FOREIGN KEY (`uploadedBy`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Group` ADD CONSTRAINT `Group_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Class`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
