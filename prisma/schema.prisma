@@ -37,7 +37,7 @@ model UserProfile {
 model Class {
   id          Int          @id @default(autoincrement())
   name        String
-  deskripsi   String?
+  deskripsi   String?      @db.Text
   token       String       @unique // Token unik untuk kelas
   youtubeID   String?     // ID YouTube untuk kelas
   createdAt   DateTime     @default(now())
