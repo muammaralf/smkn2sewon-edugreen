@@ -212,6 +212,7 @@ const generateClassToken = async () => {
 
     if (!existingClass) {
       // Token belum ada di database, kembalikan token
+      console.log(token);
       return token;
     }
 
