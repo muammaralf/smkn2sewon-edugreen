@@ -55,7 +55,6 @@ app.get("/download/:filename", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  console.log("testing");
   res.send("Welcome to the EduGreen API");
 });
 
