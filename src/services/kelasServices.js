@@ -34,29 +34,34 @@ exports.createClass = async (data) => {
 
   try {
     // Mulai transaksi untuk memastikan kedua operasi dilakukan bersama
-    const result = await prisma.$transaction(async (prisma) => {
-      const token = await generateClassToken(); // Generate token kelas
-      const insertClass = await prisma.class.create({
-        data: {
-          name: data.name,
-          deskripsi: data.deskripsi,
-          youtubeID: youtubeID(inputLink) || null, // ID YouTube opsional
-          token, // Token kelas yang unik
-        },
-      });
+    const result = await prisma.$transaction(
+      async (prisma) => {
+        const token = await generateClassToken(); // Generate token kelas
+        const insertClass = await prisma.class.create({
+          data: {
+            name: data.name,
+            deskripsi: data.deskripsi,
+            youtubeID: youtubeID(inputLink) || null, // ID YouTube opsional
+            token, // Token kelas yang unik
+          },
+        });
 
-      // Menambahkan user dengan role teacher
-      await prisma.classUser.create({
-        data: {
-          classId: insertClass.id,
-          userId: parseInt(data.userId), // ID user yang sudah ada
-          role: "TEACHER", // Atau role lain sesuai kebutuhan
-        },
-      });
+        // Menambahkan user dengan role teacher
+        await prisma.classUser.create({
+          data: {
+            classId: insertClass.id,
+            userId: parseInt(data.userId), // ID user yang sudah ada
+            role: "TEACHER", // Atau role lain sesuai kebutuhan
+          },
+        });
 
-      // Kembalikan kelas yang baru dibuat
-      return insertClass;
-    });
+        // Kembalikan kelas yang baru dibuat
+        return insertClass;
+      },
+      {
+        timeout: 10000, // 10 detik
+      }
+    );
 
     return result; // Mengembalikan kelas yang baru dibuat
   } catch (error) {
