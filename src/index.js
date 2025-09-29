@@ -13,14 +13,21 @@ const path = require("path");
 const cors = require("cors");
 const app = express();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Adjust this to your frontend URL
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    exposedHeaders: ["Content-Disposition"], // ← penting!
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Mengecek apakah origin adalah domain atau subdomain dari "cobaweb.id"
+    const regex = /^https?:\/\/(.*\.)?edugreen\.id$/;
+    if (regex.test(origin) || !origin) {
+      callback(null, true); // Mengizinkan origin yang cocok
+    } else {
+      callback(new Error("Not allowed by CORS")); // Menolak origin lainnya
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"], // Mengizinkan beberapa metode HTTP
+  allowedHeaders: ["Content-Type", "Authorization"], // Mengizinkan header tertentu
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use("/users", userRoutes);
