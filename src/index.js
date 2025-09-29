@@ -18,6 +18,7 @@ const corsOptions = {
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"], // Bisa sesuaikan dengan metode yang kamu perlukan
   allowedHeaders: ["Content-Type", "Authorization"], // Header yang diizinkan
+  credentials: false,
 };
 
 app.use(cors(corsOptions));
