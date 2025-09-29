@@ -18,7 +18,6 @@ const corsOptions = {
   origin: ["https://smkn2sewon.edugreen.id", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"], // Bisa sesuaikan dengan metode yang kamu perlukan
   allowedHeaders: ["Content-Type", "Authorization"], // Header yang diizinkan
-  credentials: true, // Menyertakan credentials (cookies, otentikasi)
 };
 
 app.use(cors(corsOptions));
