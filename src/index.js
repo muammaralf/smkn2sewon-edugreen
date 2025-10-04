@@ -15,10 +15,20 @@ const protect = require("./middleware/authMiddleware.js");
 const app = express();
 
 // Pengaturan CORS untuk mengizinkan akses dari smkn2sewon.edugreen.id dan localhost:5173
+const allowedOrigins = [
+  "https://smkn2sewon.edugreen.id",
+  "http://localhost:5173",
+];
+
 const corsOptions = {
-  origin: ["https://smkn2sewon.edugreen.id", "localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE"], // Bisa sesuaikan dengan metode yang kamu perlukan
-  allowedHeaders: ["Content-Type", "Authorization"], // Header yang diizinkan
+  origin: function (origin, callback) {
+    console.log("Request Origin:", origin); // debug
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
