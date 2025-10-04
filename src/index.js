@@ -11,6 +11,7 @@ const laporan = require("./routes/laporanRoutes.js");
 const path = require("path");
 
 const cors = require("cors");
+const protect = require("./middleware/authMiddleware.js");
 const app = express();
 
 // Pengaturan CORS untuk mengizinkan akses dari smkn2sewon.edugreen.id dan localhost:5173
@@ -18,14 +19,14 @@ const corsOptions = {
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"], // Bisa sesuaikan dengan metode yang kamu perlukan
   allowedHeaders: ["Content-Type", "Authorization"], // Header yang diizinkan
-  credentials: false,
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use("/users", userRoutes);
-app.use("/kelas", kelasRoutes);
+app.use("/kelas", protect, kelasRoutes);
 app.use("/tugas", tugasRoutes);
 app.use("/jawab", jawabanSiswaRouter);
 app.use("/pertanyaan", pertanyaan);
