@@ -16,7 +16,7 @@ const app = express();
 
 // Pengaturan CORS untuk mengizinkan akses dari smkn2sewon.edugreen.id dan localhost:5173
 const corsOptions = {
-  origin: "*",
+  origin: ["https://smkn2sewon.edugreen.id", "localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"], // Bisa sesuaikan dengan metode yang kamu perlukan
   allowedHeaders: ["Content-Type", "Authorization"], // Header yang diizinkan
   credentials: true,
