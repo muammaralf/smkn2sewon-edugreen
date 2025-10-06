@@ -15,6 +15,8 @@ const uploadMaterial = async (req, res) => {
   const title = file.originalname;
   const size = file.size;
 
+  console.log(title);
+
   // Validasi input
   if (!title || !classId || !req.file) {
     return errorResponse(res, 400, "Data tidak lengkap");
