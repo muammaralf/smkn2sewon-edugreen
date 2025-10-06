@@ -20,6 +20,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     // 🏷️ Buat nama unik dengan timestamp agar tidak bentrok
+    console.log(file);
     const fileName = `${uuidv4()}_${file.originalname}`;
     cb(null, fileName);
   },
