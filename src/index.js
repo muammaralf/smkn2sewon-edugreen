@@ -37,13 +37,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/kelas", protect, kelasRoutes);
-app.use("/tugas", tugasRoutes);
-app.use("/jawab", jawabanSiswaRouter);
-app.use("/pertanyaan", pertanyaan);
-app.use("/kelompok", kelompok);
-app.use("/materi", material);
-app.use("/proyek", proyek);
-app.use("/laporan", laporan);
+app.use("/tugas", protect, tugasRoutes);
+app.use("/jawab", protect, jawabanSiswaRouter);
+app.use("/pertanyaan", protect, pertanyaan);
+app.use("/kelompok", protect, kelompok);
+app.use("/materi", protect, material);
+app.use("/proyek", protect, proyek);
+app.use("/laporan", protect, laporan);
 
 app.get("/download/:filename", (req, res) => {
   const filename = req.params.filename;
